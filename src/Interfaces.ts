@@ -234,7 +234,7 @@ export type GroupMessage = {
     user_id: number
     nickname: string
     card: string
-    role: 'owner' | 'admin' | 'member'
+    role?: 'owner' | 'admin' | 'member'
   }
   raw_message: string
   font: number
@@ -307,7 +307,7 @@ export type GroupMessageSelf = {
     user_id: number
     nickname: string
     card: string
-    role: 'owner' | 'admin' | 'member'
+    role?: 'owner' | 'admin' | 'member'
   }
   raw_message: string
   font: number
@@ -1036,7 +1036,7 @@ export type WSSendParam = {
   }
 }
 
-type Buffer<T = string> = { [key: string]: T }
+type Buffer<T = number> = { [key: string]: T }
 
 export type WSSendReturn = {
   // ontbot11
@@ -1962,7 +1962,7 @@ export type WSSendReturn = {
                 nick: string
               }
               shareTemplateId: string
-              shareTemplateData: Buffer<unknown>
+              shareTemplateData: Buffer
               showLittleTail: string
               gamePoints: string
               gamePointsUrl: string
@@ -1993,7 +1993,7 @@ export type WSSendReturn = {
                 nick: string
               }
               shareTemplateId: string
-              shareTemplateData: Buffer<unknown>
+              shareTemplateData: Buffer
               showLittleTail: string
               gamePoints: string
               gamePointsUrl: string
