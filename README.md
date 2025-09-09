@@ -4,7 +4,7 @@
 
 针对 `napcat` 开发的 `SDK`
 
-本 SDK 中所有 `api` 基于 `napcat-v4.8.98`
+本 SDK 中所有 `api` 基于 `napcat-v4.8.109`
 
 ## 📚 文档
 

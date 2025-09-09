@@ -774,8 +774,8 @@ export class NCWebsocket extends NCWebsocketBase {
    * @napcat
    * 获取最近联系
    */
-  get_recent_contact(params: WSSendParam['get_recent_contact']) {
-    return this.send('get_recent_contact', params)
+  get_recent_contact(params?: WSSendParam['get_recent_contact']) {
+    return this.send('get_recent_contact', params ?? {})
   }
 
   /**
@@ -798,8 +798,8 @@ export class NCWebsocket extends NCWebsocketBase {
    * @napcat
    * 获取收藏表情
    */
-  fetch_custom_face(params: WSSendParam['fetch_custom_face']) {
-    return this.send('fetch_custom_face', params)
+  fetch_custom_face(params?: WSSendParam['fetch_custom_face']) {
+    return this.send('fetch_custom_face', params ?? {})
   }
 
   /**
@@ -1046,8 +1046,8 @@ export class NCWebsocket extends NCWebsocketBase {
    * @napcat
    * 获取可疑好友添加请求
    */
-  get_doubt_friends_add_request(params: WSSendParam['get_doubt_friends_add_request']) {
-    return this.send('get_doubt_friends_add_request', params)
+  get_doubt_friends_add_request(params?: WSSendParam['get_doubt_friends_add_request']) {
+    return this.send('get_doubt_friends_add_request', params ?? {})
   }
 
   /**
@@ -1062,16 +1062,16 @@ export class NCWebsocket extends NCWebsocketBase {
    * @napcat
    * 获取 RKey
    */
-  get_rkey(params: WSSendParam['get_rkey']) {
-    return this.send('get_rkey', params)
+  get_rkey() {
+    return this.send('get_rkey', {})
   }
 
   /**
    * @napcat
    * 获取 RKey 服务器
    */
-  get_rkey_server(params: WSSendParam['get_rkey_server']) {
-    return this.send('get_rkey_server', params)
+  get_rkey_server() {
+    return this.send('get_rkey_server', {})
   }
 
   /**
@@ -1096,5 +1096,61 @@ export class NCWebsocket extends NCWebsocketBase {
    */
   click_inline_keyboard_button(params: WSSendParam['click_inline_keyboard_button']) {
     return this.send('click_inline_keyboard_button', params)
+  }
+
+  /**
+   * @napcat
+   * 设置群待办
+   */
+  set_group_todo(params: WSSendParam['set_group_todo']) {
+    return this.send('set_group_todo', params)
+  }
+
+  /**
+   * @napcat
+   * 获取群相册列表
+   */
+  get_qun_album_list(params: WSSendParam['get_qun_album_list']) {
+    return this.send('get_qun_album_list', params)
+  }
+
+  /**
+   * @napcat
+   * 上传图片到群相册
+   */
+  upload_image_to_qun_album(params: WSSendParam['upload_image_to_qun_album']) {
+    return this.send('upload_image_to_qun_album', params)
+  }
+
+  /**
+   * @napcat
+   * 获取群相册媒体列表
+   */
+  get_group_album_media_list(params: WSSendParam['get_group_album_media_list']) {
+    return this.send('get_group_album_media_list', params)
+  }
+
+  /**
+   * @napcat
+   * 评论群相册
+   */
+  do_group_album_comment(params: WSSendParam['do_group_album_comment']) {
+    return this.send('do_group_album_comment', params)
+  }
+
+  /**
+   * @napcat
+   * 点赞群相册媒体
+   */
+  set_group_album_media_like(params: WSSendParam['set_group_album_media_like']) {
+    return this.send('set_group_album_media_like', params)
+  }
+
+  /**
+   * @napcat
+   * 删除群相册媒体
+   */
+  del_group_album_media(params: WSSendParam['del_group_album_media']) {
+    return this.send('del_group_album_media', params)
   }
 }

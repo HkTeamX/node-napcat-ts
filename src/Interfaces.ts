@@ -1019,7 +1019,9 @@ export type WSSendParam = {
   set_group_add_option: {
     group_id: string
     add_type: number
-  } & ({} | { group_question: string; group_answer: string })
+    group_question?: string
+    group_answer?: string
+  }
   set_group_search: { group_id: string; no_code_finger_open?: number; no_finger_open?: number }
   get_doubt_friends_add_request: { count?: number }
   set_doubt_friends_add_request: { flag: string }
@@ -1034,6 +1036,24 @@ export type WSSendParam = {
     callback_data?: string
     msg_seq?: string
   }
+  set_group_todo: { group_id: string } & ({ message_seq: string } | { message_id: string })
+  get_qun_album_list: { group_id: string }
+  upload_image_to_qun_album: {
+    group_id: string
+    album_id: string
+    album_name: string
+    file: string
+  }
+  get_group_album_media_list: { group_id: string; album_id: string; attach_info?: string }
+  do_group_album_comment: { group_id: string; album_id: string; lloc: string; content: string }
+  set_group_album_media_like: {
+    group_id: string
+    album_id: string
+    lloc: string
+    id: string
+    set?: boolean
+  }
+  del_group_album_media: { group_id: string; album_id: string; lloc: string }
 }
 
 type Buffer<T = number> = { [key: string]: T }
@@ -2061,4 +2081,17 @@ export type WSSendReturn = {
     promptType: number
     promptIcon: number
   }
+  set_group_todo: null
+  get_qun_album_list: { name: string; album_id: number }[]
+  upload_image_to_qun_album: null
+  get_group_album_media_list: {
+    seq: number
+    result: number
+    errMs: string
+    trace_id: string
+    request_time_line: unknown
+  }
+  do_group_album_comment: null
+  set_group_album_media_like: null
+  del_group_album_media: null
 }
