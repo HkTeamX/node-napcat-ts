@@ -23,7 +23,7 @@ export class NCEventBus {
 
   on<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
     const handlers = this.#events.get(event) ?? []
-    // @ts-ignore 表达式过于复杂无法表示
+    // @ts-expect-error 表达式过于复杂无法表示
     if (handlers.indexOf(handler) >= 0) return this
     handlers.push(handler)
     this.#events.set(event, handlers)

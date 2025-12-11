@@ -145,7 +145,7 @@ export class NCWebsocketBase {
         return
       }
 
-      let json = JSON.parse(strData)
+      const json = JSON.parse(strData)
       if (json.post_type === 'message' || json.post_type === 'message_sent') {
         if (json.message_format === 'string') {
           // 直接处理message字段，而不是整个json对象

@@ -43,6 +43,9 @@
     "build": "tsc",
     "dev": "nodemon",
     "test": "tsx test/index.ts",
+    "lint": "eslint src test",
+    "lint:fix": "eslint src test --fix",
+    "format": "prettier --write \"src/**/*.{ts,js,json,md}\" \"test/**/*.{ts,js}\" \"*.{json,md}\"",
     "typecheck": "tsc --noEmit",
     "docs:dev": "pnpm -C docs run dev",
     "docs:build": "pnpm -C docs run build",
@@ -54,12 +57,18 @@
     "ws": "^8.18.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/node": "^22.15.19",
     "@types/ws": "^8.18.1",
     "dotenv": "^16.5.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "nodemon": "^3.1.10",
+    "prettier": "^3.7.4",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.49.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
