@@ -2,6 +2,7 @@ import WebSocket, { type Data } from 'isomorphic-ws'
 import { nanoid } from 'nanoid'
 import type {
   APIRequest,
+  APISuccessResponse,
   EventHandleMap,
   EventKey,
   HandlerResMap,
@@ -226,12 +227,12 @@ export class NCWebsocketBase {
     }
 
     return new Promise<WSSendReturn[T]>((resolve, reject) => {
-      const onSuccess = (response: any) => {
+      const onSuccess = (response: APISuccessResponse<keyof WSSendReturn>) => {
         this.#echoMap.delete(echo)
-        return resolve(response.data)
+        return resolve(response.data as WSSendReturn[T])
       }
 
-      const onFailure = (reason: any) => {
+      const onFailure = (reason: unknown) => {
         this.#echoMap.delete(echo)
         return reject(reason)
       }

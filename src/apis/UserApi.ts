@@ -1,6 +1,7 @@
 import { NCWebsocketBase } from '../NCWebsocketBase.js'
 import { WSSendParam } from '../Interfaces.js'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function UserApi<TBase extends new (...args: any[]) => NCWebsocketBase>(Base: TBase) {
   return class extends Base {
     send_private_msg(params: WSSendParam['send_private_msg']) {

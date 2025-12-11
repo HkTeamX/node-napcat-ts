@@ -1,6 +1,7 @@
 export interface UnSafeStruct {
   type: string
   data: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [k: string]: any
   }
 }
@@ -21,24 +22,24 @@ export interface Receive {
   image: {
     type: 'image'
     data:
-      | {
-          // 普通图片
-          summary: string
-          file: string
-          sub_type: number
-          url: string
-          file_size: string
-        }
-      | {
-          // 商城表情
-          summary: string
-          file: string
-          sub_type: string
-          url: string
-          key: string
-          emoji_id: string
-          emoji_package_id: number
-        }
+    | {
+      // 普通图片
+      summary: string
+      file: string
+      sub_type: number
+      url: string
+      file_size: string
+    }
+    | {
+      // 商城表情
+      summary: string
+      file: string
+      sub_type: string
+      url: string
+      key: string
+      emoji_id: string
+      emoji_package_id: number
+    }
   }
   file: {
     type: 'file'
@@ -153,13 +154,13 @@ interface BaseSegment<T extends string, D> {
 }
 
 // 各种具体消息类型，继承自 BaseSegment
-export interface TextSegment extends BaseSegment<'text', { text: string }> {}
+export interface TextSegment extends BaseSegment<'text', { text: string }> { }
 
-export interface AtSegment extends BaseSegment<'at', { qq: string | 'all' }> {}
+export interface AtSegment extends BaseSegment<'at', { qq: string | 'all' }> { }
 
-export interface ReplySegment extends BaseSegment<'reply', { id: string }> {}
+export interface ReplySegment extends BaseSegment<'reply', { id: string }> { }
 
-export interface FaceSegment extends BaseSegment<'face', { id: string }> {}
+export interface FaceSegment extends BaseSegment<'face', { id: string }> { }
 
 export interface MFaceSegment extends BaseSegment<
   'mface',
@@ -169,7 +170,7 @@ export interface MFaceSegment extends BaseSegment<
     key: string
     summary?: string
   }
-> {}
+> { }
 
 export interface ImageSegment extends BaseSegment<
   'image',
@@ -178,29 +179,29 @@ export interface ImageSegment extends BaseSegment<
     summary?: string
     sub_type?: string
   }
-> {}
+> { }
 
-export interface FileSegment extends BaseSegment<'file', { file: string; name?: string }> {}
+export interface FileSegment extends BaseSegment<'file', { file: string; name?: string }> { }
 
 export interface VideoSegment extends BaseSegment<
   'video',
   { file: string; name?: string; thumb?: string }
-> {}
+> { }
 
-export interface RecordSegment extends BaseSegment<'record', { file: string }> {}
+export interface RecordSegment extends BaseSegment<'record', { file: string }> { }
 
-export interface JsonSegment extends BaseSegment<'json', { data: string }> {}
+export interface JsonSegment extends BaseSegment<'json', { data: string }> { }
 
-export interface DiceSegment extends BaseSegment<'dice', any> {}
+export interface DiceSegment extends BaseSegment<'dice', Record<string, never>> { }
 
-export interface RPSSegment extends BaseSegment<'rps', any> {}
+export interface RPSSegment extends BaseSegment<'rps', Record<string, never>> { }
 
-export interface MarkdownSegment extends BaseSegment<'markdown', { content: string }> {}
+export interface MarkdownSegment extends BaseSegment<'markdown', { content: string }> { }
 
 export interface CloudMusicSegment extends BaseSegment<
   'music',
   { type: 'qq' | '163' | 'kugou' | 'kuwo' | 'migu'; id: string }
-> {}
+> { }
 
 export interface MusicSegmentCustom extends BaseSegment<
   'music',
@@ -212,7 +213,7 @@ export interface MusicSegmentCustom extends BaseSegment<
     title?: string
     singer?: string
   }
-> {}
+> { }
 
 export type MusicSegment = CloudMusicSegment | MusicSegmentCustom
 
@@ -227,14 +228,14 @@ export interface NodeSegment extends BaseSegment<
     prompt?: string
     time?: string
   }
-> {}
+> { }
 
-export interface ForwardSegment extends BaseSegment<'forward', { id: string }> {}
+export interface ForwardSegment extends BaseSegment<'forward', { id: string }> { }
 
 export interface ContactSegment extends BaseSegment<
   'contact',
   { type: 'qq' | 'group'; id: string }
-> {}
+> { }
 
 // 联合类型
 export type SendMessageSegment =

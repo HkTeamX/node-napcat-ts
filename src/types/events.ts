@@ -1,4 +1,4 @@
-import { NodeSegment, Receive, SendMessageSegment } from '../Structs.js'
+import { Receive, SendMessageSegment } from '../Structs.js'
 
 // 心跳包
 export interface HeartBeat {

@@ -3,12 +3,15 @@ import type { Receive, SendMessageSegment, UnSafeStruct } from './Structs.js'
 const getTime = () => new Date().toLocaleString()
 
 export const logger = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   warn: (...args: any[]) => {
     console.warn(`[${getTime()}]`, ...args)
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   debug: (...args: any[]) => {
     console.debug(`[${getTime()}]`, ...args)
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dir: (json: any) => {
     console.dir(json, { depth: null })
   },
@@ -35,6 +38,7 @@ export function convertCQCodeToJSON(msg: string): Receive[keyof Receive][] | Sen
     }) as Receive[keyof Receive][] | SendMessageSegment[]
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const _conver = (json: any) => {
   if (json.type === 'text') return json.data.text
   return `[CQ:${json.type}${Object.entries(json.data)
@@ -53,7 +57,7 @@ export function convertJSONToCQCode(json: UnSafeStruct | UnSafeStruct[]): string
   }
 }
 
-export function CQCodeDecode(str: string | any): string {
+export function CQCodeDecode(str: string | unknown): string {
   if (typeof str !== 'string') return String(str || '') // 尝试转换为字符串，或返回空字符串
   return str
     .replace(/&#44;/g, ',')
