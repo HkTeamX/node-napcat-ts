@@ -1,5 +1,5 @@
 export * from './NCWebsocketApi.js'
-
 export * from './Interfaces.js'
 export * from './Structs.js'
+export * from './MessageHelpers.js'
 export * from './Utils.js'
