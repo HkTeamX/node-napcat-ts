@@ -3,20 +3,31 @@
 推荐在调用 `connect` 方法前注册哦~
 
 ```typescript
-// 可以多次触发
+// 传入的回调将会在每次事件被触发时被调用
 napcat.on('事件名', (context) => {
   console.log(context)
 })
 
-// 只能触发一次
+// 传入的回调在首次触发调用后随即被取消绑定
 napcat.once('事件名', (context) => {
   console.log(context)
 })
 
-// 取消绑定
-napcat.off('事件名', (context) => {
-  console.log(context)
-})
+// 链式使用绑定函数
+napcat
+  .once('事件名', (context) => {
+    console.log(context)
+  })
+  .on('事件名', (context) => {
+    console.log(context)
+  })
+
+// 取消绑定 向off传入与绑定函数传入的回调的同一个引用以取消绑定
+const handler = (context) => {
+  console.log(context);
+};
+napcat.on('事件名', handler)
+napcat.off('同一个事件名', handler)
 
 // 手动触发事件(高级方法)
 napcat.emit('事件名', context)
