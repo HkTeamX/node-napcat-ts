@@ -297,6 +297,7 @@ export class NCWebsocketBase {
    * 注册监听方法
    * @param event
    * @param handle
+   * @returns 返回自身引用
    */
   on<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
     this.#eventBus.on<T>(event, handle)
@@ -307,6 +308,7 @@ export class NCWebsocketBase {
    * 只执行一次
    * @param event
    * @param handle
+   * @returns 返回自身引用
    */
   once<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
     this.#eventBus.once(event, handle)
@@ -317,10 +319,31 @@ export class NCWebsocketBase {
    * 解除监听方法
    * @param event
    * @param handle
+   * @returns 返回自身引用
    */
   off<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
     this.#eventBus.off(event, handle)
     return this
+  }
+
+  /**
+   * effect风格的订阅 效果同on
+   * @param event
+   * @param handle
+   * @returns 返回执行后取消订阅的函数
+   */
+  subscribe<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
+    return this.#eventBus.subscribe(event, handle)
+  }
+
+  /**
+   * effect风格的订阅 效果同once
+   * @param event
+   * @param handle
+   * @returns 返回执行后取消订阅的函数
+   */
+  subscribeOnce<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
+    return this.#eventBus.subscribeOnce(event, handle)
   }
 
   /**
@@ -332,4 +355,6 @@ export class NCWebsocketBase {
     this.#eventBus.emit(type, context)
     return this
   }
+
+
 }
