@@ -935,6 +935,7 @@ export type WSSendParam = {
     emojiId: string
     emojiType: string
     count?: number
+    cookie?: string
   }
   set_input_status: { user_id: string; event_type: number }
   get_group_info_ex: { group_id: number }
@@ -1096,6 +1097,7 @@ export type WSSendReturn = {
     raw_message: string
     font: number
     post_type: 'message' | 'message_sent'
+    emoji_likes_list: { emoji_id: string; emoji_type: string; likes_cnt: string }[]
   } & MessageType
   get_forward_msg: {
     messages: WSSendReturn['get_msg'][]

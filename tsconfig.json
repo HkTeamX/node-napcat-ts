@@ -3,6 +3,7 @@
   "exclude": ["test/test.ts"],
   "compilerOptions": {
     "declaration": true, //让tsc自动生成对用的.d.ts文件。
+    "rootDir": "./src",
     "outDir": "./dist", //指定输出文件夹
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
