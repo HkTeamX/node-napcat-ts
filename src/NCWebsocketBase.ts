@@ -25,6 +25,9 @@ export class NCWebsocketBase {
 
   #eventBus: NCEventBus
   #echoMap: Map<string, ResponseHandler>
+  #connectingPromise?: Promise<void>
+  #reconnectTimer?: ReturnType<typeof setTimeout>
+  #disconnected: boolean
 
   constructor(NCWebsocketOptions: NCWebsocketOptions, debug = false) {
     this.#accessToken = NCWebsocketOptions.accessToken ?? ''
@@ -52,6 +55,7 @@ export class NCWebsocketBase {
     this.#debug = debug
     this.#eventBus = new NCEventBus(this)
     this.#echoMap = new Map()
+    this.#disconnected = false
   }
 
   // ==================WebSocket操作=============================
@@ -60,12 +64,24 @@ export class NCWebsocketBase {
    * await connect() 等待 ws 连接
    */
   async connect() {
-    return new Promise<void>((resolve, reject) => {
+    if (this.#socket?.readyState === WebSocket.OPEN) return
+    if (this.#connectingPromise) return this.#connectingPromise
+
+    this.#disconnected = false
+
+    const connectingPromise = new Promise<void>((resolve, reject) => {
+      const clearConnectingPromise = () => {
+        if (this.#connectingPromise === connectingPromise) {
+          this.#connectingPromise = undefined
+        }
+      }
+
       this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
 
       const socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
 
       socket.onopen = () => {
+        clearConnectingPromise()
         this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
         this.#reconnection.nowAttempts = 1
         resolve()
@@ -78,23 +94,38 @@ export class NCWebsocketBase {
           reconnection: this.#reconnection,
         })
         if (
+          !this.#disconnected &&
           this.#reconnection.enable &&
           this.#reconnection.nowAttempts < this.#reconnection.attempts
         ) {
           this.#reconnection.nowAttempts++
-          setTimeout(async () => {
+          if (this.#reconnectTimer) {
+            clearTimeout(this.#reconnectTimer)
+          }
+
+          const reconnectTimer = setTimeout(async () => {
+            if (this.#reconnectTimer === reconnectTimer) {
+              this.#reconnectTimer = undefined
+            }
+            if (this.#disconnected) {
+              return
+            }
             try {
               await this.reconnect()
             } catch (error) {
               reject(error)
             }
           }, this.#reconnection.delay)
+          this.#reconnectTimer = reconnectTimer
         }
+
+        clearConnectingPromise()
       }
 
       socket.onmessage = (event) => this.#message(event.data)
 
       socket.onerror = (event) => {
+        clearConnectingPromise()
         this.#eventBus.emit('socket.error', {
           reconnection: this.#reconnection,
           error_type: 'connect_error',
@@ -103,6 +134,7 @@ export class NCWebsocketBase {
 
         if (this.#throwPromise) {
           if (
+            !this.#disconnected &&
             this.#reconnection.enable &&
             this.#reconnection.nowAttempts < this.#reconnection.attempts
           ) {
@@ -120,9 +152,20 @@ export class NCWebsocketBase {
 
       this.#socket = socket
     })
+
+    this.#connectingPromise = connectingPromise
+    return this.#connectingPromise
   }
 
   disconnect() {
+    this.#disconnected = true
+    this.#connectingPromise = undefined
+
+    if (this.#reconnectTimer) {
+      clearTimeout(this.#reconnectTimer)
+      this.#reconnectTimer = undefined
+    }
+
     if (this.#socket) {
       this.#socket.close(1000)
       this.#socket = undefined
