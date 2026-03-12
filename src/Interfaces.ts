@@ -3,12 +3,12 @@ import { NodeSegment, Receive, SendMessageSegment } from './Structs.js'
 export interface NCWebsocketOptionsBaseUrl {
   baseUrl: string
   accessToken?: string
-  throwPromise?: boolean
   reconnection?: {
     enable?: boolean
     attempts?: number
     delay?: number
   }
+  apiTimeout?: number
 }
 
 export interface NCWebsocketOptionsHost {
@@ -16,12 +16,12 @@ export interface NCWebsocketOptionsHost {
   host: string
   port: number
   accessToken?: string
-  throwPromise?: boolean
   reconnection?: {
     enable?: boolean
     attempts?: number
     delay?: number
   }
+  apiTimeout?: number
 }
 
 export type NCWebsocketOptions = NCWebsocketOptionsBaseUrl | NCWebsocketOptionsHost
@@ -112,6 +112,7 @@ export interface ResponseHandler {
   onSuccess: (response: APISuccessResponse<keyof WSSendReturn>) => void
   onFailure: (reason: APIErrorResponse) => void
   message: APIRequest<keyof WSSendParam>
+  timeoutTimer?: ReturnType<typeof setTimeout>
 }
 
 export interface ApiHandler {

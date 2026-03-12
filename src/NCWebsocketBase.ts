@@ -19,9 +19,9 @@ export class NCWebsocketBase {
 
   #baseUrl: string
   #accessToken: string
-  #throwPromise: boolean
   #reconnection: WSReconnection
   #socket?: WebSocket
+  #apiTimeout: number
 
   #eventBus: NCEventBus
   #echoMap: Map<string, ResponseHandler>
@@ -31,7 +31,6 @@ export class NCWebsocketBase {
 
   constructor(NCWebsocketOptions: NCWebsocketOptions, debug = false) {
     this.#accessToken = NCWebsocketOptions.accessToken ?? ''
-    this.#throwPromise = NCWebsocketOptions.throwPromise ?? false
 
     if ('baseUrl' in NCWebsocketOptions) {
       this.#baseUrl = NCWebsocketOptions.baseUrl
@@ -52,6 +51,7 @@ export class NCWebsocketBase {
     const { enable = true, attempts = 10, delay = 5000 } = NCWebsocketOptions.reconnection ?? {}
     this.#reconnection = { enable, attempts, delay, nowAttempts: 1 }
 
+    this.#apiTimeout = NCWebsocketOptions.apiTimeout ?? 2 * 60 * 1000
     this.#debug = debug
     this.#eventBus = new NCEventBus(this)
     this.#echoMap = new Map()
@@ -64,120 +64,101 @@ export class NCWebsocketBase {
    * await connect() 等待 ws 连接
    */
   async connect() {
-    if (this.#socket?.readyState === WebSocket.OPEN) return
+    // 如果正在连接中，等待连接完成
     if (this.#connectingPromise) return this.#connectingPromise
+    // 如果已经连接成功，直接返回
+    if (this.#socket) return
 
     this.#disconnected = false
 
-    const connectingPromise = new Promise<void>((resolve, reject) => {
-      const clearConnectingPromise = () => {
-        if (this.#connectingPromise === connectingPromise) {
-          this.#connectingPromise = undefined
-        }
-      }
-
+    this.#connectingPromise = new Promise<void>((resolve) => {
       this.#eventBus.emit('socket.connecting', { reconnection: this.#reconnection })
 
-      const socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
+      this.#socket = new WebSocket(`${this.#baseUrl}?access_token=${this.#accessToken}`)
 
-      socket.onopen = () => {
-        clearConnectingPromise()
+      this.#socket.onmessage = (event) => this.#message(event.data)
+
+      this.#socket.onopen = () => {
         this.#eventBus.emit('socket.open', { reconnection: this.#reconnection })
+
         this.#reconnection.nowAttempts = 1
+        this.#connectingPromise = undefined
+
         resolve()
       }
 
-      socket.onclose = async (event) => {
+      this.#socket.onclose = async (event) => {
         this.#eventBus.emit('socket.close', {
           code: event.code,
           reason: event.reason,
           reconnection: this.#reconnection,
         })
+
+        if (this.#disconnected) return
+
+        this.#socket = undefined
+
         if (
-          !this.#disconnected &&
           this.#reconnection.enable &&
           this.#reconnection.nowAttempts < this.#reconnection.attempts
         ) {
           this.#reconnection.nowAttempts++
-          if (this.#reconnectTimer) {
-            clearTimeout(this.#reconnectTimer)
-          }
 
-          const reconnectTimer = setTimeout(async () => {
-            if (this.#reconnectTimer === reconnectTimer) {
-              this.#reconnectTimer = undefined
-            }
-            if (this.#disconnected) {
-              return
-            }
-            try {
-              await this.reconnect()
-            } catch (error) {
-              reject(error)
-            }
+          clearTimeout(this.#reconnectTimer)
+          this.#reconnectTimer = setTimeout(async () => {
+            this.#reconnectTimer = undefined
+            if (this.#disconnected) return
+            await this.reconnect()
           }, this.#reconnection.delay)
-          this.#reconnectTimer = reconnectTimer
         }
-
-        clearConnectingPromise()
       }
 
-      socket.onmessage = (event) => this.#message(event.data)
-
-      socket.onerror = (event) => {
-        clearConnectingPromise()
+      this.#socket.onerror = (event) => {
         this.#eventBus.emit('socket.error', {
           reconnection: this.#reconnection,
           error_type: 'connect_error',
           errors: event?.error?.errors ?? [event?.error ?? null],
         })
-
-        if (this.#throwPromise) {
-          if (
-            !this.#disconnected &&
-            this.#reconnection.enable &&
-            this.#reconnection.nowAttempts < this.#reconnection.attempts
-          ) {
-            // 重连未到最后一次，等待继续重连，不抛出错误
-            return
-          }
-
-          reject({
-            reconnection: this.#reconnection,
-            error_type: 'connect_error',
-            errors: event?.error?.errors ?? [event?.error ?? null],
-          })
-        }
       }
-
-      this.#socket = socket
     })
 
-    this.#connectingPromise = connectingPromise
     return this.#connectingPromise
   }
 
-  disconnect() {
+  async disconnect() {
     this.#disconnected = true
     this.#connectingPromise = undefined
 
-    if (this.#reconnectTimer) {
-      clearTimeout(this.#reconnectTimer)
-      this.#reconnectTimer = undefined
-    }
+    clearTimeout(this.#reconnectTimer)
+    this.#reconnectTimer = undefined
 
-    if (this.#socket) {
-      this.#socket.close(1000)
-      this.#socket = undefined
-    }
+    const socket = this.#socket
+    if (!socket) return
+
+    return new Promise<void>((resolve) => {
+      if (socket.readyState === WebSocket.CLOSED) {
+        this.#socket = undefined
+        resolve()
+        return
+      }
+
+      const handleClose = () => {
+        socket.removeEventListener('close', handleClose)
+        this.#socket = undefined
+        resolve()
+      }
+      socket.addEventListener('close', handleClose)
+
+      socket.close(1000)
+    })
   }
 
   async reconnect() {
-    this.disconnect()
+    await this.disconnect()
     await this.connect()
   }
 
-  #message(data: Data) {
+  async #message(data: Data) {
     let strData: string
     try {
       strData = data.toString()
@@ -231,9 +212,7 @@ export class NCWebsocketBase {
             },
           })
 
-          if (this.#throwPromise) throw new Error(json.message)
-
-          this.disconnect()
+          await this.disconnect()
 
           return
         }
@@ -271,37 +250,42 @@ export class NCWebsocketBase {
     return new Promise<WSSendReturn[T]>((resolve, reject) => {
       const onSuccess = (response: any) => {
         this.#echoMap.delete(echo)
+        clearTimeout(timeoutTimer)
         return resolve(response.data)
       }
 
       const onFailure = (reason: any) => {
         this.#echoMap.delete(echo)
+        clearTimeout(timeoutTimer)
         return reject(reason)
       }
+
+      const timeoutTimer = setTimeout(() => {
+        onFailure({
+          status: 'failed',
+          retcode: -1,
+          data: null,
+          message: 'api response timeout',
+          echo,
+        })
+      }, this.#apiTimeout)
 
       this.#echoMap.set(echo, {
         message,
         onSuccess,
         onFailure,
+        timeoutTimer,
       })
 
       this.#eventBus.emit('api.preSend', message)
 
-      if (this.#socket === undefined) {
-        reject({
+      if (this.#socket === undefined || this.#socket.readyState !== WebSocket.OPEN) {
+        onFailure({
           status: 'failed',
           retcode: -1,
           data: null,
           message: 'api socket is not connected',
-          echo: '',
-        })
-      } else if (this.#socket.readyState === WebSocket.CLOSING) {
-        reject({
-          status: 'failed',
-          retcode: -1,
-          data: null,
-          message: 'api socket is closed',
-          echo: '',
+          echo,
         })
       } else {
         this.#socket.send(JSON.stringify(message))

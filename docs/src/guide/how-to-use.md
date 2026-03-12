@@ -12,44 +12,46 @@ node-napcat-ts 使用 `正向连接` 来连接到 `NapcatQQ`
 
 ### 详细配置
 
-``` typescript
+```typescript
 import { NCWebsocket } from 'node-napcat-ts'
 
-const napcat = new NCWebsocket({
-  protocol: 'wss',
-  host: 'napcat.example',
-  port: 443,
-  accessToken: 'your token',
-  // 是否需要在触发 socket.error 时抛出错误, 默认关闭
-  throwPromise: true,
-  // ↓ 自动重连(可选)
-  reconnection: {
-    enable: true,
-    attempts: 10,
-    delay: 5000
-  }
-  // ↓ 是否开启 DEBUG 模式
-}, false)
+const napcat = new NCWebsocket(
+  {
+    protocol: 'wss',
+    host: 'napcat.example',
+    port: 443,
+    accessToken: 'your token',
+    // ↓ 自动重连(可选)
+    reconnection: {
+      enable: true,
+      attempts: 10,
+      delay: 5000,
+    },
+    // ↓ 是否开启 DEBUG 模式
+  },
+  false,
+)
 ```
 
 ### 快速配置
 
-``` typescript
+```typescript
 import { NCWebsocket } from 'node-napcat-ts'
 
-const napcat = new NCWebsocket({
-  baseUrl: 'ws://napcat.example',
-  accessToken: 'your token',
-  // 是否需要在触发 socket.error 时抛出错误, 默认关闭
-  throwPromise: true,
-  // ↓ 自动重连(可选)
-  reconnection: {
-    enable: true,
-    attempts: 10,
-    delay: 5000
-  }
-  // ↓ 是否开启 DEBUG 模式
-}, false)
+const napcat = new NCWebsocket(
+  {
+    baseUrl: 'ws://napcat.example',
+    accessToken: 'your token',
+    // ↓ 自动重连(可选)
+    reconnection: {
+      enable: true,
+      attempts: 10,
+      delay: 5000,
+    },
+    // ↓ 是否开启 DEBUG 模式
+  },
+  false,
+)
 ```
 
 ## 2.绑定事件
@@ -58,7 +60,7 @@ const napcat = new NCWebsocket({
 
 ## 3.连接
 
-``` typescript
+```typescript
 // 正常连接
 napcat.connect()
 

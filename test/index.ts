@@ -6,7 +6,6 @@ const WsConfig: NCWebsocketOptions = {
   host: '127.0.0.1',
   port: 4040,
   accessToken: process.env.NC_ACCESS_TOKEN, // 请填写你的access_token
-  throwPromise: false,
   reconnection: {
     enable: true,
     attempts: 10,
