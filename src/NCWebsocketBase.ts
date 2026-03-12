@@ -103,18 +103,13 @@ export class NCWebsocketBase {
           this.#reconnection.nowAttempts < this.#reconnection.attempts
         ) {
           this.#reconnection.nowAttempts++
+
           clearTimeout(this.#reconnectTimer)
-
-          const reconnectTimer = setTimeout(async () => {
+          this.#reconnectTimer = setTimeout(async () => {
             this.#reconnectTimer = undefined
-
-            if (this.#disconnected) {
-              return
-            }
-
+            if (this.#disconnected) return
             await this.reconnect()
           }, this.#reconnection.delay)
-          this.#reconnectTimer = reconnectTimer
         }
       }
 
