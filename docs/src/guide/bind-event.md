@@ -24,8 +24,8 @@ napcat
 
 // 取消绑定 向off传入与绑定函数传入的回调的同一个引用以取消绑定
 const handler = (context) => {
-  console.log(context);
-};
+  console.log(context)
+}
 napcat.on('事件名', handler)
 napcat.off('同一个事件名', handler)
 
@@ -77,4 +77,37 @@ function handler(context: AllHandlers['message']) {
 比如:
 
 `message` 可以被 `message.private` 触发
+:::
+
+::: tip node-napcat-ts特有事件
+
+```ts
+export interface SocketHandler {
+  // 连接中
+  'socket.connecting': WSConnecting
+  // 连接成功
+  'socket.open': WSOpenRes
+  // 连接断开
+  'socket.close': WSCloseRes
+  // 连接失败
+  // 如果 error_type 为 response_error, 那么大概率是token错误
+  'socket.error': WSErrorRes
+  socket:
+    | SocketHandler['socket.connecting']
+    | SocketHandler['socket.open']
+    | SocketHandler['socket.close']
+    | SocketHandler['socket.error']
+}
+
+export interface ApiHandler {
+  // 准备发送接口调用
+  'api.preSend': APIRequest<keyof WSSendParam>
+  // 收到响应
+  'api.response': ApiHandler['api.response.success'] | ApiHandler['api.response.failure']
+  'api.response.success': APISuccessResponse<keyof WSSendReturn>
+  'api.response.failure': APIErrorResponse
+  api: ApiHandler['api.preSend'] | ApiHandler['api.response']
+}
+```
+
 :::
