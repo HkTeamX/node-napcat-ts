@@ -355,6 +355,4 @@ export class NCWebsocketBase {
     this.#eventBus.emit(type, context)
     return this
   }
-
-
 }
