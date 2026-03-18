@@ -330,7 +330,7 @@ export class NCWebsocketBase {
    * effect风格的订阅 效果同on
    * @param event
    * @param handle
-   * @returns 返回执行后取消订阅的函数
+   * @returns 返回用于取消订阅的函数
    */
   subscribe<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
     return this.#eventBus.subscribe(event, handle)
@@ -340,7 +340,7 @@ export class NCWebsocketBase {
    * effect风格的订阅 效果同once
    * @param event
    * @param handle
-   * @returns 返回执行后取消订阅的函数
+   * @returns 返回用于取消订阅的函数
    */
   subscribeOnce<T extends EventKey>(event: T, handle: EventHandleMap[T]) {
     return this.#eventBus.subscribeOnce(event, handle)
