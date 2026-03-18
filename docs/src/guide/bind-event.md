@@ -33,18 +33,18 @@ napcat.off('同一个事件名', handler)
 napcat.emit('事件名', context)
 
 // effect风格的绑定和取消绑定
-const ubSubscribeFn = napcat.subscribe('事件名', (ctx)=>{ //这里的ctx是带类型推导的 可以不用写外边再标一次类型
+const unsubscribeFn = napcat.subscribe('事件名', (ctx)=>{ //这里的ctx是带类型推导的 可以不用写外边再标一次类型
   // subscribe 对应的是on的功能
 })
 // 在需要停止监听的时候调用函数即可清理
-ubSubscribeFn()
+unsubscribeFn()
 
 // 对于once提供了subscribeOnce
-const ubSubscribeOnceFn = napcat.subscribeOnce('事件名', (ctx)=>{ 
+const unsubscribeOnceFn = napcat.subscribeOnce('事件名', (ctx)=>{ 
   // subscribeOnce 对应的是once的功能
 })
 // 在需要停止监听的时候调用函数即可清理 (off是无法清理once注册的函数的)
-ubSubscribeOnceFn()
+unsubscribeOnceFn()
 
 
 ```
