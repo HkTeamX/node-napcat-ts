@@ -305,7 +305,8 @@ export class NCWebsocketBase {
   }
 
   /**
-   * 只执行一次
+   * 注册一次性监听方法，触发一次后自动解除监听
+   * @deprecated 因为once方法会创建一个函数包裹，无法正确的off，所以不推荐使用once方法，建议使用subscribeOnce方法替代
    * @param event
    * @param handle
    * @returns 返回自身引用

@@ -42,6 +42,9 @@ export class NCEventBus {
     return this
   }
 
+  /**
+   * @deprecated 因为once方法会创建一个函数包裹，无法正确的off，所以不推荐使用once方法，建议使用subscribeOnce方法替代
+   */
   once<T extends EventKey>(event: T, handler: EventHandleMap[T]) {
     const onceHandler = (context: HandlerResMap[T]) => {
       handler(context)
@@ -51,14 +54,14 @@ export class NCEventBus {
     return this
   }
 
-  subscribe<T extends EventKey>(event: T, handler: EventHandleMap[T]): (() => void) {
+  subscribe<T extends EventKey>(event: T, handler: EventHandleMap[T]): () => void {
     this.on(event, handler)
     return () => {
       this.off(event, handler)
     }
   }
 
-  subscribeOnce<T extends EventKey>(event: T, handler: EventHandleMap[T]): (() => void) {
+  subscribeOnce<T extends EventKey>(event: T, handler: EventHandleMap[T]): () => void {
     const onceHandler = (context: HandlerResMap[T]) => {
       handler(context)
       this.off(event, onceHandler as EventHandleMap[T])
@@ -68,7 +71,6 @@ export class NCEventBus {
       this.off(event, onceHandler as EventHandleMap[T])
     }
   }
-
 
   emit<T extends EventKey>(event: T, context: HandlerResMap[T]): boolean {
     const handlers = (this.#events.get(event) as EventHandleMap[T][]) ?? []
