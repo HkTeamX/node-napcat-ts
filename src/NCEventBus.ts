@@ -51,6 +51,25 @@ export class NCEventBus {
     return this
   }
 
+  subscribe<T extends EventKey>(event: T, handler: EventHandleMap[T]): (() => void) {
+    this.on(event, handler)
+    return () => {
+      this.off(event, handler)
+    }
+  }
+
+  subscribeOnce<T extends EventKey>(event: T, handler: EventHandleMap[T]): (() => void) {
+    const onceHandler = (context: HandlerResMap[T]) => {
+      handler(context)
+      this.off(event, onceHandler as EventHandleMap[T])
+    }
+    this.on(event, onceHandler as EventHandleMap[T])
+    return () => {
+      this.off(event, onceHandler as EventHandleMap[T])
+    }
+  }
+
+
   emit<T extends EventKey>(event: T, context: HandlerResMap[T]): boolean {
     const handlers = (this.#events.get(event) as EventHandleMap[T][]) ?? []
 
