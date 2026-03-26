@@ -96,8 +96,6 @@ export class NCWebsocketBase {
 
         if (this.#disconnected) return
 
-        this.#socket = undefined
-
         if (
           this.#reconnection.enable &&
           this.#reconnection.nowAttempts < this.#reconnection.attempts
@@ -109,6 +107,7 @@ export class NCWebsocketBase {
             this.#reconnectTimer = undefined
             if (this.#disconnected) return
             await this.reconnect()
+            resolve()
           }, this.#reconnection.delay)
         }
       }
@@ -155,7 +154,7 @@ export class NCWebsocketBase {
 
   async reconnect() {
     await this.disconnect()
-    await this.connect()
+    return await this.connect()
   }
 
   async #message(data: Data) {
